@@ -1,0 +1,310 @@
+<?php
+/*
+ * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
+ -------------------------------------------------------------------------
+ Ticketalerts plugin for GLPI
+ Copyright (C) 2003-2016 by the Ticketalerts Development Team.
+
+ https://github.com/InfotelGLPI/ticketalerts
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of Ticketalerts.
+
+ ticketalerts is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ ticketalerts is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Ticketalerts. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
+ */
+
+if (!defined('GLPI_ROOT')) {
+    die("Sorry. You can't access directly to this file");
+}
+
+class PluginTicketalertsAlertGroupCriteria extends CommonDBTM {
+
+    public $dohistory = true;
+    static $rightname = 'plugin_ticketalerts_manage_groupalert';
+
+    static $criterias_types = ['', 'itilcategory', 'alert_type', 'ticket_status',
+        'ticket_type', 'ticket_impact','ticket_priority',
+        'ticket_urgency', 'ticket_location','ticket_creator',
+        'alert_creator','ticket_source', 'entity'];
+    /**
+     * @param int $nb
+     *
+     * @return string|\translated
+     */
+    static function getTypeName($nb = 0) {
+        return _n('Criterion', 'Criteria', $nb, 'ticketalerts');
+    }
+
+    /**
+     * Get menu name
+     *
+     * @return string
+     */
+    static function getMenuName() {
+        return self::getTypeName();
+    }
+
+    static function canDelete() {
+        return Session::haveRight(PluginTicketalertsAlertGroupCriteria::$rightname, READ);
+    }
+
+
+    static function canCreate() {
+        return Session::haveRight(PluginTicketalertsAlertGroupCriteria::$rightname, READ);
+    }
+
+    /**
+     * @param array|\datas $input
+     *
+     * @return array|\datas|\the
+     */
+    function prepareInputForAdd($input)
+    {
+
+        if (empty($input["criteria"])) {
+            Session::addMessageAfterRedirect(__("Please select a criteria before submit", 'ticketalerts'),
+                false, ERROR);
+            return false;
+        }
+
+        $alertgroup_criteria = new PluginTicketalertsAlertGroupCriteria();
+
+        if ($input['rule_criterion_negation'] != 'NEGATION' ) {
+            if ($alertgroup_criteria->find(['criteria' => $input['criteria'],
+                    'plugin_ticketalerts_alertgroups_id' => $input['plugin_ticketalerts_alertgroups_id'],
+                    'rule_criterion' => 'AND',
+                    'group_number' => $input['group_number']])
+                && $input['rule_criterion'] == 'AND') {
+                Session::addMessageAfterRedirect(__("There's already a same existing criteria type for this group,
+                                                please select 'Or' Rule criterion", 'ticketalerts'),
+                    false, ERROR);
+                return false;
+            }
+        }
+
+
+        return $input;
+    }
+
+
+    /**
+     * @param array|\datas $input
+     *
+     * @return array|\datas|\the
+     */
+    function prepareInputForUpdate($input) {
+        if ($this->fields['users_id'] > 0) {
+            Session::addMessageAfterRedirect(__('The alert is already taken into account', 'ticketalerts'), false, ERROR);
+            return [];
+        }
+
+        if (isset($input['alert_date']) && empty($input['alert_date'])) {
+            $input['alert_date'] = 'NULL';
+        }
+
+        return $input;
+    }
+
+    static function getRuleCriterionValueByCriterion($input) {
+        switch ($input['rule_criterion']) {
+            case 'AND':
+                return __('And', 'ticketalerts');
+                break;
+            case 'OR':
+                return __('Or', 'ticketalerts');
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    static function getFilterValueByCriterion($input) {
+
+        switch ($input['criteria']) {
+            case 'ticket_type':
+                return Ticket::getTicketTypeName($input['filter']);
+                break;
+            case 'itilcategory':
+                $itil_cat = new ITILCategory();
+                $itil_cat->getFromDB($input['filter']);
+                return $itil_cat->getField('name');
+                break;
+            case 'alert_type':
+                $alert_type = new PluginTicketalertsAlertType();
+                $alert_type->getFromDB($input['filter']);
+                return $alert_type->getField('name');
+                break;
+            case 'ticket_status':
+                return Ticket::getStatus($input['filter']);
+                break;
+            case 'ticket_impact':
+                return CommonITILObject::getImpactName($input['filter']);
+                break;
+            case 'ticket_urgency':
+                return CommonITILObject::getUrgencyName($input['filter']);
+                break;
+            case 'ticket_priority':
+                return CommonITILObject::getPriorityName($input['filter']);
+                break;
+            case 'ticket_location':
+                $location = new Location();
+                $location->getFromDB($input['filter']);
+                return $location->getField('name');
+                break;
+            case 'ticket_creator':
+            case 'alert_creator':
+                return getUserName($input['filter']);
+                break;
+            case 'ticket_source':
+                $requesttype = new RequestType();
+                $requesttype->getFromDB($input['filter']);
+                return $requesttype->getField('name');
+                break;
+            case 'entity':
+                $entity = new Entity();
+                $entity->getFromDB($input['filter']);
+                return $entity->getRawCompleteName();
+                break;
+            default:
+                break;
+        }
+    }
+
+    static function giveWhereClauseByCriteria($input) {
+
+        switch ($input) {
+            case 'ticket_type':
+                return '`glpi_tickets`.`type`';
+                break;
+            case 'itilcategory':
+                return '`glpi_tickets`.`itilcategories_id`';
+                break;
+            case 'alert_type':
+                return '`glpi_plugin_ticketalerts_alerts`.`plugin_ticketalerts_alerttypes_id`';
+                break;
+            case 'ticket_status':
+                return '`glpi_tickets`.`status`';
+                break;
+            case 'ticket_impact':
+                return '`glpi_tickets`.`impact`';
+                break;
+            case 'ticket_urgency':
+                return '`glpi_tickets`.`urgency`';
+                break;
+            case 'ticket_location':
+                return '`glpi_tickets`.`locations_id`';
+                break;
+            case 'ticket_creator':
+                return '`glpi_tickets`.`users_id_recipient`';
+                break;
+            case 'alert_creator':
+                return '`glpi_plugin_ticketalerts_alerts`.`users_id_requester`';
+                break;
+            case 'ticket_source':
+                return '`glpi_tickets`.`requesttypes_id`';
+            case 'entity':
+                return '`glpi_tickets`.`entities_id`';
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Get the standard massive actions which are forbidden
+     *
+     * @since version 0.84
+     *
+     * @return an array of massive actions
+     **/
+    public function getForbiddenStandardMassiveAction() {
+        $forbidden = parent::getForbiddenStandardMassiveAction();
+        $forbidden[] = 'update';
+        return $forbidden;
+    }
+
+
+    static function getCriteriasNameForDropdown($values) {
+        $tabs = [];
+
+        foreach ($values as $value) {
+            switch ($value) {
+                case 'itilcategory':
+                    $tabs[$value] = __('Ticket category','ticketalerts');
+                    break;
+                case 'alert_type':
+                    $tabs[$value] = PluginTicketalertsAlertType::getTypeName();
+                    break;
+                case 'ticket_status':
+                    $tabs[$value] = __('Status');
+                    break;
+                case 'ticket_type':
+                    $tabs[$value] = __('Type');
+                    break;
+                case 'ticket_impact':
+                    $tabs[$value] = __('Impact');
+                    break;
+                case 'ticket_urgency':
+                    $tabs[$value] = __('Urgency');
+                    break;
+                case 'ticket_priority':
+                    $tabs[$value] = __('Priority');
+                    break;
+                case 'ticket_location':
+                    $tabs[$value] = __('Location');
+                    break;
+                case 'ticket_creator':
+                    $tabs[$value] = __('Ticket creator','ticketalerts');
+                    break;
+                case 'alert_creator':
+                    $tabs[$value] = __('Ticket alert creator','ticketalerts');
+                    break;
+                case 'ticket_source':
+                    $tabs[$value] = __('Request source');
+                    break;
+
+                case 'entity':
+                    $tabs[$value] = Entity::getTypeName();
+                    break;
+                default:
+                    $tabs[$value] =Dropdown::EMPTY_VALUE;
+                    break;
+            }
+        }
+        ksort($tabs);
+
+        return $tabs;
+    }
+
+    static function getArrayCriterionNegation() {
+        $tab = ['AFFIRMATION' =>__('is', 'ticketalerts'),
+            'NEGATION' => __('is not', 'ticketalerts'),
+        ];
+
+        return $tab;
+    }
+
+    static function getValueOfNegation($key) {
+        $tab = ['AFFIRMATION' =>__('is', 'ticketalerts'),
+            'NEGATION' => __('is not', 'ticketalerts'),
+        ];
+
+        return $tab[$key];
+    }
+
+}

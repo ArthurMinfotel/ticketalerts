@@ -1,0 +1,217 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Tasklists Development Team
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Translators:
+# Xavier CAILLAUD <tsmr@thetsmr.fr>, 2013,2015
+msgid ""
+msgstr ""
+"Project-Id-Version: GLPI Project - Tasklists plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-16 18:16+0100\n"
+"PO-Revision-Date: 2021-02-16 18:18+0100\n"
+"Last-Translator: Xavier CAILLAUD <tsmr@thetsmr.fr>\n"
+"Language-Team: French (France) (http://www.transifex.com/tsmr/GLPI_tasklists/"
+"language/fr_FR/)\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 2.4.1\n"
+
+#: hook.php:40
+msgid "New comment tickets"
+msgstr "Nouveau commentaire de tickets"
+
+#: hook.php:42
+msgid "New incident"
+msgstr "Nouvel incident"
+
+#: hook.php:44
+msgid "New customer request"
+msgstr "Nouvelle demande client"
+
+#: setup.php:78 inc/alert.class.php:50 inc/alert.class.php:536
+msgid "Ticket alert"
+msgid_plural "Tickets alerts"
+msgstr[0] "Alerte ticket"
+msgstr[1] "Alertes tickets"
+
+#: setup.php:96
+#, fuzzy
+#| msgid "This plugin requires GLPI >= 9.2"
+msgid "This plugin requires GLPI >= 9.4"
+msgstr "Ce plugin nécessite GLPI >= 9.2"
+
+#: front/alert.form.php:72 inc/alert.class.php:225 inc/alertgroup.class.php:216
+#: inc/alertgroupcriteria.class.php:104
+msgid "The alert is already taken into account"
+msgstr "Cette alerte a déjà été pris en compte"
+
+#: front/alert.form.php:83
+#, php-format
+msgid "Took into account the alert %1$s related to ticket"
+msgstr "a pris en compte l'alerte %1$s concernant le ticket"
+
+#: front/alert.form.php:89
+msgid "Ticket taken into account by Alturing"
+msgstr "Ticket pris en compte par Alturing"
+
+#: front/config.form.php:64
+msgid "Please activate the plugin"
+msgstr "Merci d'activer le plugin"
+
+#: inc/alert.class.php:78 inc/alert.class.php:255 inc/alert.class.php:582
+#: inc/alerttype.class.php:38
+msgid "Alert type"
+msgid_plural "Alert Types"
+msgstr[0] "Type d'alerte"
+msgstr[1] "Types d'alerte"
+
+#: inc/alert.class.php:106
+msgid "Date of taking into account"
+msgstr "Date de prise en compte"
+
+#: inc/alert.class.php:114 inc/alert.class.php:275 inc/alert.class.php:579
+msgid "Alert date"
+msgstr "Date de l'alerte"
+
+#: inc/alert.class.php:209
+msgid "Alert"
+msgstr "Alerte"
+
+#: inc/alert.class.php:297
+#, php-format
+msgid "The %s"
+msgstr "Le %s"
+
+#: inc/alert.class.php:347 inc/alert.class.php:364 inc/alert.class.php:649
+msgid "To take into account"
+msgstr "A prendre en compte"
+
+#: inc/alert.class.php:350 inc/alert.class.php:365
+msgid "Taken into account"
+msgstr "Pris en compte"
+
+#: inc/alert.class.php:580
+msgid "Case number"
+msgstr "Numéro de dossier"
+
+#: inc/alert.class.php:581
+msgid "Case type"
+msgstr "Type de dossier"
+
+#: inc/alert.class.php:759
+msgid "No datas for the this group"
+msgstr "Pas de données pour ce groupe"
+
+#: inc/alert.class.php:764
+msgid "No criteria have been setup for this group"
+msgstr "Aucun critère n'a été configuré pour ce groupe"
+
+#: inc/alert.class.php:789 inc/alert.class.php:797
+msgid "Missing parameter"
+msgstr "Paramètre manquant"
+
+#: inc/alert.class.php:805 inc/alert.class.php:813 inc/alert.class.php:834
+msgid "Bad parameter"
+msgstr "Mauvais Paramètre"
+
+#: inc/alert.class.php:823
+msgid "Alert type not found into GLPI"
+msgstr "Type d'alerte non trouvée dans GLPI"
+
+#: inc/alertgroup.class.php:45
+msgid "Ticket alert group"
+msgid_plural "Tickets alerts groups"
+msgstr[0] "Groupe d'alerte ticket"
+msgstr[1] "Groupes d'alerte ticket"
+
+#: inc/alertgroup.class.php:201
+msgid "You can't add a group without name"
+msgstr "Vous ne pouvez pas ajouter de groupe sans nom"
+
+#: inc/alertgroup.class.php:265 inc/alertgroupcriteria.class.php:48
+msgid "Criterion"
+msgid_plural "Criteria"
+msgstr[0] "Critère"
+msgstr[1] "Critères"
+
+#: inc/alertgroup.class.php:269
+msgid "Rule criterion"
+msgstr "Règle du critère"
+
+#: inc/alertgroup.class.php:271 inc/alertgroupcriteria.class.php:118
+msgid "And"
+msgstr "Et"
+
+#: inc/alertgroup.class.php:271 inc/alertgroupcriteria.class.php:121
+msgid "Or"
+msgstr "Ou"
+
+#: inc/alertgroup.class.php:282 inc/alertgroup.class.php:338
+msgid "Filter"
+msgid_plural "Filters"
+msgstr[0] "Filtre"
+msgstr[1] "Filtres"
+
+#: inc/alertgroup.class.php:339
+#, fuzzy
+#| msgid "Criterion"
+#| msgid_plural "Criteria"
+msgid "Rule Criterion"
+msgstr "Critère"
+
+#: inc/alertgroupcriteria.class.php:77
+msgid "Please select a criteria before submit"
+msgstr "Merci de choisir un critère avant de soumettre "
+
+#: inc/alertgroupcriteria.class.php:87
+msgid ""
+"There's already a same existing criteria type for this group,\n"
+"                                                please select 'Or' Rule "
+"criterion"
+msgstr ""
+"Il y a déjà un critère identique pour ce groupe, merci de choisir  la règle "
+"de critère \"Ou\""
+
+#: inc/config.class.php:40
+msgid "Setup"
+msgstr "Configuration"
+
+#: inc/config.class.php:73
+msgid "Intranet Setup"
+msgstr "Configuration de l'intranet"
+
+#: inc/config.class.php:108
+msgid "Intranet setup"
+msgstr "Configuration de l'intranet"
+
+#: inc/notificationtargetalert.class.php:40
+msgid "Error of importing alert from API"
+msgstr "Erreur à l'import de l'alerte depuis l'API"
+
+#: inc/notificationtargetalert.class.php:47
+msgid "Address of ticketalerts setup"
+msgstr "Configuration de l'adresse de ticketalerts"
+
+#: inc/notificationtargetalert.class.php:74
+#: inc/notificationtargetalert.class.php:88
+msgid "Error import alert"
+msgstr "Erreur d'import de l'alerte"
+
+#: inc/notificationtargetalert.class.php:75
+#: inc/notificationtargetalert.class.php:89
+msgid "An error when importing the alert occurred"
+msgstr "Une erreur s'est produite lors de l'import de l'alerte"
+
+#: inc/profile.class.php:127 inc/profile.class.php:155
+msgid "Manage group alert"
+msgstr "Gérer les groupes d'alerte ticket"
+
+#~ msgid "There's already a same existing criteria type for this group"
+#~ msgstr "Il y a déjà un type de critère existant pour ce groupe"
+
+#~ msgid "Ticket not found into GLPI"
+#~ msgstr "Ticket non trouvé dans GLPI"

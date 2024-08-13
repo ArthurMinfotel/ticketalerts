@@ -1,0 +1,138 @@
+/*
+ * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
+ -------------------------------------------------------------------------
+ Ticketalerts plugin for GLPI
+ Copyright (C) 2003-2016 by the Ticketalerts Development Team.
+
+ https://github.com/InfotelGLPI/ticketalerts
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of Ticketalerts.
+
+ ticketalerts is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ ticketalerts is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Ticketalerts. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
+ */
+
+/*#personal-tabs {*/
+
+/*    width: 100%;*/
+/*    height:30px;*/
+/*    border-bottom: solid 1px #CCC;*/
+/*    padding-right: 2px;*/
+/*    margin-top: 30px;*/
+
+
+/*}*/
+
+/*a {cursor:pointer;}*/
+
+/*#personal-tabs li {*/
+/*    float:left;*/
+/*    list-style:none;*/
+/*    border-top:1px solid #ccc;*/
+/*    border-left:1px solid #ccc;*/
+/*    border-right:1px solid #ccc;*/
+/*    margin-right:5px;*/
+/*    border-top-left-radius:3px;*/
+/*    border-top-right-radius:3px;*/
+/*    outline:none;*/
+/*}*/
+
+/*#personal-tabs li a {*/
+
+/*    font-family:Arial, Helvetica, sans-serif;*/
+/*    font-size: small;*/
+/*    font-weight: bold;*/
+/*    color: #666666 !important;*/
+/*    padding-top: 5px;*/
+/*    padding-left: 7px;*/
+/*    padding-right: 7px;*/
+/*    padding-bottom: 8px;*/
+/*    display:block;*/
+/*    background: #FFF;*/
+/*    border-top-left-radius:3px;*/
+/*    border-top-right-radius:3px;*/
+/*    text-decoration:none;*/
+/*    outline:none;*/
+
+/*}*/
+
+/*#personal-tabs li a.inactive{*/
+/*    padding-top:5px;*/
+/*    padding-bottom:8px;*/
+/*    padding-left: 8px;*/
+/*    padding-right: 8px;*/
+/*    color:#666666;*/
+/*    background: #EEE;*/
+/*    outline:none;*/
+/*    border-bottom: solid 1px #CCC;*/
+
+/*}*/
+
+/*#personal-tabs li a:hover, #personal-tabs li a.inactive:hover {*/
+
+/*    color: #c31625;*/
+/*    outline:none;*/
+/*}*/
+
+
+#pluginTicketAlertsCentralList tr:first-child th {
+    background-color: #dee2e6;
+}
+#pluginTicketAlertsCentralList tr:nth-child(2) th {
+    background-color: #f8f9fa;
+    padding-bottom: 0;
+}
+#pluginTicketAlertsCentralList tr:nth-child(3) th {
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+}
+#personal-tabs {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-end;
+    overflow: hidden;
+    padding-top: 5px;
+}
+#personal-tabs li {
+    margin: 0 0.25rem;
+    border: none;
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+#personal-tabs li a {
+    display: block;
+    padding: 0 1.5rem;
+    height: 3.3rem;
+    line-height: 3.3rem;
+    color: #9d9d9c;
+    background-color: #dee2e6;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+    cursor: pointer;
+    font-weight: normal;
+}
+#personal-tabs li a:not(.inactive) {
+    cursor: text;
+    box-shadow: 0 1px 1px 0 rgba(108, 117, 125, 0.08), 0 1px 3px 1px rgba(108, 117, 125, 0.16);
+    background-color: #fff;
+    color: #212529;
+    font-weight: bold;
+}
+#personal-tabs li a.inactive:hover {
+    background-color: #ced4da;
+    color: #212529;
+}
