@@ -225,3 +225,10 @@ function plugin_ticketalerts_getDropdown()
         return [];
     }
 }
+
+function plugin_ticketalerts_display_central()
+{
+    echo "<tr><td>";
+    PluginTicketalertsAlert::showCentralList();
+    echo "</tr></td>";
+}

@@ -40,11 +40,18 @@ function plugin_init_ticketalerts() {
    // on central page
    if (strpos($_SERVER['REQUEST_URI'], "central.php") !== false) {
       //history and climb feature
-      $PLUGIN_HOOKS['add_javascript']['ticketalerts'][] = 'scripts/central.js.php';
-      $PLUGIN_HOOKS['add_javascript']['ticketalerts'][] = 'scripts/alert.js';
-      $PLUGIN_HOOKS['add_css']['ticketalerts'][] = "css/ticketalerts.css";
-
+       $PLUGIN_HOOKS['add_javascript']['ticketalerts'][] = 'scripts/alert.js';
+       $PLUGIN_HOOKS['add_css']['ticketalerts'][] = "css/ticketalerts.css";
    }
+
+    if (strpos($_SERVER['REQUEST_URI'], "common.tabs.php")) {
+        if ($_REQUEST['_glpi_tab'] === 'Central$1') { // tab "Vue personnelle" sur central
+            if (Session::getCurrentInterface() == "central"
+                && Session::haveRight("plugin_ticketalerts", READ)) {
+                $PLUGIN_HOOKS['display_central']['ticketalerts'] = 'plugin_ticketalerts_display_central';
+            }
+        }
+    }
 
    if (Session::getLoginUserID()) {
 
