@@ -1014,9 +1014,6 @@ class PluginTicketalertsAlert extends CommonDBTM
                       WHERE `glpi_plugin_ticketalerts_alerts`.`users_id` = 0 AND `glpi_tickets`.`is_deleted` = 0
                       AND `glpi_plugin_ticketalerts_alerts`.`is_deleted` = 0  AND ({$where})";
 
-
-                Toolbox::logError($group . "\r\n");
-                Toolbox::logError($where . "\r\n");
                 $result = $DB->query($query);
 
                 if ($result->num_rows > 0) {
