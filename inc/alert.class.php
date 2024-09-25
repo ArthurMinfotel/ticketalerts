@@ -1015,8 +1015,6 @@ class PluginTicketalertsAlert extends CommonDBTM
                       AND `glpi_plugin_ticketalerts_alerts`.`is_deleted` = 0  AND ({$where})";
 
 
-                Toolbox::logError($group . "\r\n");
-                Toolbox::logError($where . "\r\n");
                 $result = $DB->query($query);
 
                 if ($result->num_rows > 0) {
@@ -1044,9 +1042,9 @@ class PluginTicketalertsAlert extends CommonDBTM
     /**
      * methodAddAlert : Add alert
      *
-     * @param type $params
+     * @param array $params
      * @return type
-     * @global type $DB
+     * @global array|string[]|void
      */
     static function methodAddAlert($params)
     {
