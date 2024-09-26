@@ -1104,7 +1104,7 @@ class PluginTicketalertsAlert extends CommonDBTM
             }
         }
 
-        $ticket = new ticket();
+        $ticket = new Ticket();
         if (isset($params["tickets_id"]) && !$ticket->getFromDB($params["tickets_id"])) {
             $options = [
                 'typeerror' => __('Bad parameter', 'ticketalerts'),
