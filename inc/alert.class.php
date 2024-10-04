@@ -268,7 +268,13 @@ class PluginTicketalertsAlert extends CommonDBTM
 
         echo "<td>" . __('Name') . "</td>";
         echo "<td>";
-        Html::autocompletionTextField($this, "name");
+        echo Html::input(
+            'name',
+            [
+                'type' => 'text',
+                'value' => $this->fields['name']
+            ]
+        );
         echo "</td>";
 
         echo "<td>" . _n('Alert type', 'Alert Types', 1, 'ticketalerts') . "</td><td>";

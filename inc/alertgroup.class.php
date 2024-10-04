@@ -408,7 +408,13 @@ class PluginTicketalertsAlertGroup extends CommonDBTM {
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Name') . "</td>";
         echo "<td>";
-        Html::autocompletionTextField($this, "name");
+        echo Html::input(
+            'name',
+            [
+                'type' => 'text',
+                'value' => $this->fields['name']
+            ]
+        );
         echo "</td>";
         echo "<td>". __('Comment') . "</td>";
 
