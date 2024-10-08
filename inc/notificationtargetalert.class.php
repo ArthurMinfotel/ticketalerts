@@ -62,7 +62,7 @@ class PluginTicketalertsNotificationTargetAlert extends NotificationTarget {
                   FROM `glpi_plugin_ticketalerts_configs`
                   WHERE `id` = 1";
 
-       $result = $DB->query($query);
+       $result = $DB->doQuery($query);
        $res['email'] = $DB->result($result, 0, 'email');
 
        $this->addToRecipientsList($res);

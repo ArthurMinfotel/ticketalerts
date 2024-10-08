@@ -322,8 +322,16 @@ class PluginTicketalertsAlertGroup extends CommonDBTM {
         echo "</div>";
 
 
+        $self = new self();
+        $self->getFromDB($ID);
+        $groupOperator = $this->fields["group_criterion"] === 'AND' ? __('And', 'ticketalerts') : __('Or', 'ticketalerts');
+        echo "<p>" . __('Group operator', 'ticketalerts') . ' : ' . $groupOperator . "</p>";
+
         $group_criterias = new PluginTicketalertsAlertGroupCriteria();
-        $group_criterias = $group_criterias->find(['plugin_ticketalerts_alertgroups_id' => $ID]);
+        $group_criterias = $group_criterias->find(
+            ['plugin_ticketalerts_alertgroups_id' => $ID],
+            ['`group_number` ASC, `criteria` ASC, `rule_criterion` ASC']
+        );
 
 
         if (count($group_criterias)) {
@@ -423,7 +431,7 @@ class PluginTicketalertsAlertGroup extends CommonDBTM {
         echo "</td>";
         echo "</tr>";
         echo "<tr class='tab_bg_1'>";
-        echo "<td>" . __('Group operator') . "</td>";
+        echo "<td>" . __('Group operator', 'ticketalerts') . "</td>";
         echo "<td>";
         $values = ['AND' => __('And', 'ticketalerts'), 'OR' => __('Or', 'ticketalerts')];
         Dropdown::showFromArray('group_criterion', $values,['value' => $this->fields["group_criterion"]]);

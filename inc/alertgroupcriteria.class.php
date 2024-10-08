@@ -36,10 +36,28 @@ class PluginTicketalertsAlertGroupCriteria extends CommonDBTM {
     public $dohistory = true;
     static $rightname = 'plugin_ticketalerts_manage_groupalert';
 
-    static $criterias_types = ['', 'itilcategory', 'alert_type', 'ticket_status',
-        'ticket_type', 'ticket_impact','ticket_priority',
-        'ticket_urgency', 'ticket_location','ticket_creator',
-        'alert_creator','ticket_source', 'entity'];
+    static $criterias_types = [
+        '',
+        'itilcategory',
+        'alert_type',
+        'ticket_status',
+        'ticket_type',
+        'ticket_impact',
+        'ticket_priority',
+        'ticket_urgency',
+        'ticket_location',
+        'ticket_creator',
+        'alert_creator',
+        'ticket_source',
+        'entity'
+    ];
+
+    static $recursive_criterias = [
+        'itilcategory',
+        'entity',
+        'ticket_location'
+    ];
+
     /**
      * @param int $nb
      *
@@ -185,6 +203,11 @@ class PluginTicketalertsAlertGroupCriteria extends CommonDBTM {
         }
     }
 
+    /**
+     * Get the SQL selector for the corresponding field in database
+     * @param $input string
+     * @return string|void format = `table`.`column`
+     */
     static function giveWhereClauseByCriteria($input) {
 
         switch ($input) {

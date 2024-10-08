@@ -866,147 +866,94 @@ class PluginTicketalertsAlert extends CommonDBTM
     {
         global $DB;
 
-        $where = '';
-        $where_array = [];
-        $reformat_where = '';
-        $counter_criteria = 1;
         $alerts_by_group = [];
-        $itilcategories = '';
 
         // group by filter and = or in case
         foreach ($groups_alert_criterias as $group => $criteria) {
+            $where = '';
             $where_array = [];
-            $criterion_array = [];
             if (count($criteria) > 0) {
                 foreach ($criteria as $key => $value) {
-                    $reformat_where = PluginTicketalertsAlertGroupCriteria::giveWhereClauseByCriteria(
+                    $field = PluginTicketalertsAlertGroupCriteria::giveWhereClauseByCriteria(
                         $value['criteria']
                     );
-                    if ($value['criteria'] == 'itilcategory' && $value['is_recursive'] == 1) {
+                    if ($value['is_recursive'] == 1 && in_array($value['criteria'], PluginTicketalertsAlertGroupCriteria::$recursive_criterias)) {
                         $negation = "";
                         if ($value['rule_criterion_negation'] != "AFFIRMATION") {
                             $negation = "NOT";
                         }
-                        $itilcategories = getSonsOf('glpi_itilcategories', $value['filter']);
-                        $where_array[$value['group_number']][$reformat_where][] = ' ' . $negation . ' IN (' . implode(
-                                ',',
-                                $itilcategories
-                            ) . ")";
-                        $criterion_array[$reformat_where][] = $value['rule_criterion'];
-                    } elseif ($value['criteria'] == 'entity' && $value['is_recursive'] == 1) {
-                        $negation = "";
-                        if ($value['rule_criterion_negation'] != "AFFIRMATION") {
-                            $negation = "NOT";
+                        switch($value['criteria']) {
+                            case 'itilcategory' :
+                                $table = 'glpi_itilcategories';
+                                break;
+                            case 'entity' :
+                                $table = 'glpi_entities';
+                                break;
+                            case 'ticket_location' :
+                                $table = 'glpi_locations';
+                                break;
                         }
-                        $itilcategories = getSonsOf('glpi_entities', $value['filter']);
-                        $where_array[$value['group_number']][$reformat_where][] = ' ' . $negation . ' IN (' . implode(
-                                ',',
-                                $itilcategories
-                            ) . ")";
-                        $criterion_array[$reformat_where][] = $value['rule_criterion'];
-                    } elseif ($value['criteria'] == 'ticket_location' && $value['is_recursive'] == 1) {
-                        $negation = "";
-                        if ($value['rule_criterion_negation'] != "AFFIRMATION") {
-                            $negation = "NOT";
-                        }
-                        $itilcategories = getSonsOf('glpi_locations', $value['filter']);
-                        $where_array[$value['group_number']][$reformat_where][] = ' ' . $negation . ' IN (' . implode(
-                                ',',
-                                $itilcategories
-                            ) . ")";
-                        $criterion_array[$reformat_where][] = $value['rule_criterion'];
+                        $childrens = getSonsOf($table, $value['filter']);
+                        $where_array[$value['group_number']][$field][] = [
+                            'link' => $value['rule_criterion'],
+                            'condition' => ' ' . $negation . ' IN (' . implode(
+                                    ',',
+                                    $childrens
+                                ) . ")",
+                            'rule_criterion_negation' => $value['rule_criterion_negation']
+                        ];
                     } else {
                         $negation = " = ";
                         if ($value['rule_criterion_negation'] != "AFFIRMATION") {
                             $negation = " != ";
                         }
-                        $where_array[$value['group_number']][$reformat_where][] = $negation . $value['filter'];
-                        $criterion_array[$reformat_where][] = $value['rule_criterion'];
+                        $where_array[$value['group_number']][$field][] = [
+                            'link' => $value['rule_criterion'],
+                            'condition' => $negation . $value['filter'],
+                            'rule_criterion_negation' => $value['rule_criterion_negation']
+                        ];
                     }
                 }
-
-                //manage AND & OR case
-//      foreach ($where_array as $type => $value) {
-//         foreach ($value as $count => $data) {
-//            // And & or case
-//            if (count($value) > 1) {
-//                  if ($count == 0) {
-//                     if (!empty($where)) {
-//                        $where .= " AND ";
-//                     }
-//                  $where .= '(' . $type . $data . " OR ";
-//               } else  {
-//                  // last iteration
-//                  if (($count + 1) == sizeof($value)) {
-//                     $where .= $type . $data . ")";
-//                  } else {
-//                     $where .=  $type . $data . " OR ";
-//                  }
-//               }
-//            } else  {
-//               if (!empty($where)) {
-//                  $where .= " AND ";
-//               }
-//               $where .=  $type . $data;
-//            }
-//         }
-//      }
-
-                $number = 0;
-                $cpt = 0;
+                $countGroup = 0;
                 $alert_group = new PluginTicketalertsAlertGroup();
                 $alert_group->getFromDB($group);
                 $operator = $alert_group->fields['group_criterion'];
                 foreach ($where_array as $group_number => $criterias) {
-                    if ($cpt != 0) {
+                    $countCriterias = 0;
+                    // not the first group for the research, add operator between it and the previous group
+                    if ($countGroup != 0) {
                         $where .= ") $operator (";
                     } else {
+                        // open group
                         $where .= "(";
                     }
-                    $cpt2 = 0;
                     foreach ($criterias as $type => $value) {
-                        foreach ($value as $count => $data) {
-                            // And & or case
-                            if (count($value) > 1) {
-                                if ($count == 0) {
-                                    if (!empty($where) && $cpt2 != 0) {
-                                        if ($criterion_array[$type][$count] == 'AFFIRMATION') {
-                                            $where .= " AND ";
-                                        } else {
-                                            $where .= " OR ";
-                                        }
-                                    }
-                                    $where .= '(' . $type . $data;
-                                } else {
-                                    // last iteration
-                                    if ($criterion_array[$type][$count] == 'AND') {
+                        foreach ($value as $position => $condition) {
+                            // first condition on this criteria in the group
+                            if ($position == 0) {
+                                // separate criterias in the group if its not the first criteria in the group
+                                if ($countCriterias != 0) {
+                                    if ($condition['rule_criterion_negation'] == 'AFFIRMATION') {
                                         $where .= " AND ";
                                     } else {
                                         $where .= " OR ";
                                     }
-                                    if (($count + 1) == sizeof($value)) {
-                                        $where .= $type . $data . ")";
-                                    } else {
-                                        $where .= $type . $data;
-                                    }
                                 }
+                                // open the section, no link needed
+                                $where .=  '(' . $type . ' ' . $condition['condition'];
                             } else {
-                                if (!empty($where) && $cpt2 != 0) {
-                                    if ($criterion_array[$type][$count] == 'AND') {
-                                        $where .= " AND ";
-                                    } else {
-                                        $where .= " OR ";
-                                    }
-                                }
-                                $where .= $type . $data;
+                                $where .= ' ' . $condition['link'] . ' ' . $type . ' ' . $condition['condition'];
                             }
-                            $cpt2++;
+                            // last condition for this criteria in the group, end the section
+                            if ($position == (count($value) - 1)) {
+                                $where .= ')';
+                            }
                         }
+                        $countCriterias++;
                     }
-                    $cpt++;
+                    $countGroup++;
                 }
                 $where .= ")";
-
 
                 $query = "   SELECT `glpi_plugin_ticketalerts_alerts`.`alert_date`,
                              `glpi_plugin_ticketalerts_alerts`.`tickets_id`,
@@ -1020,7 +967,7 @@ class PluginTicketalertsAlert extends CommonDBTM
                       WHERE `glpi_plugin_ticketalerts_alerts`.`users_id` = 0 AND `glpi_tickets`.`is_deleted` = 0
                       AND `glpi_plugin_ticketalerts_alerts`.`is_deleted` = 0  AND ({$where})";
 
-                $result = $DB->query($query);
+                $result = $DB->doQuery($query);
 
                 if ($result->num_rows > 0) {
                     while ($alert = $DB->fetchAssoc($result)) {
@@ -1034,11 +981,6 @@ class PluginTicketalertsAlert extends CommonDBTM
                 //No criterion
                 $alerts_by_group[$group] = __("No criteria have been setup for this group", "ticketalerts");
             }
-
-            $counter_criteria = 1;
-            $where = '';
-            $query = '';
-            $result = '';
         }
 
         return $alerts_by_group;
