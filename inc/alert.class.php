@@ -869,11 +869,22 @@ class PluginTicketalertsAlert extends CommonDBTM
         $alerts_by_group = [];
 
         // group by filter and = or in case
-        foreach ($groups_alert_criterias as $group => $criteria) {
-            $where = '';
-            $where_array = [];
-            if (count($criteria) > 0) {
-                foreach ($criteria as $key => $value) {
+        foreach ($groups_alert_criterias as $group => $criterias) {
+            if (count($criterias) > 0) {
+                $where = '';
+                $alert_group = new PluginTicketalertsAlertGroup();
+                $alert_group->getFromDB($group);
+                $groupsOperators = $alert_group->getGroupsOperatorsArray($criterias);
+
+                $previousGroup = null;
+                $previousMainGroup = null;
+                $previousSubGroup = null;
+                foreach ($criterias as $value) {
+                    $previousGroup = $previousMainGroup . '_' . $previousSubGroup;
+                    $currentGroup = $value['group_number'];
+                    $split = explode('_', $value['group_number']);
+                    $currentMainGroup = $split[0];
+                    $currentSubGroup = $split[1];
                     $field = PluginTicketalertsAlertGroupCriteria::giveWhereClauseByCriteria(
                         $value['criteria']
                     );
@@ -894,66 +905,55 @@ class PluginTicketalertsAlert extends CommonDBTM
                                 break;
                         }
                         $childrens = getSonsOf($table, $value['filter']);
-                        $where_array[$value['group_number']][$field][] = [
-                            'link' => $value['rule_criterion'],
-                            'condition' => ' ' . $negation . ' IN (' . implode(
+                        $link = $value['rule_criterion'];
+                        $condition = ' ' . $negation . ' IN (' . implode(
                                     ',',
                                     $childrens
-                                ) . ")",
-                            'rule_criterion_negation' => $value['rule_criterion_negation']
-                        ];
+                                ) . ")";
                     } else {
                         $negation = " = ";
                         if ($value['rule_criterion_negation'] != "AFFIRMATION") {
                             $negation = " != ";
                         }
-                        $where_array[$value['group_number']][$field][] = [
-                            'link' => $value['rule_criterion'],
-                            'condition' => $negation . $value['filter'],
-                            'rule_criterion_negation' => $value['rule_criterion_negation']
-                        ];
+                        $link = $value['rule_criterion'];
+                        $condition = $negation . $value['filter'];
                     }
-                }
-                $countGroup = 0;
-                $alert_group = new PluginTicketalertsAlertGroup();
-                $alert_group->getFromDB($group);
-                $operator = $alert_group->fields['group_criterion'];
-                foreach ($where_array as $group_number => $criterias) {
-                    $countCriterias = 0;
-                    // not the first group for the research, add operator between it and the previous group
-                    if ($countGroup != 0) {
-                        $where .= ") $operator (";
-                    } else {
-                        // open group
-                        $where .= "(";
-                    }
-                    foreach ($criterias as $type => $value) {
-                        foreach ($value as $position => $condition) {
-                            // first condition on this criteria in the group
-                            if ($position == 0) {
-                                // separate criterias in the group if its not the first criteria in the group
-                                if ($countCriterias != 0) {
-                                    if ($condition['rule_criterion_negation'] == 'AFFIRMATION') {
-                                        $where .= " AND ";
-                                    } else {
-                                        $where .= " OR ";
-                                    }
-                                }
-                                // open the section, no link needed
-                                $where .=  '(' . $type . ' ' . $condition['condition'];
-                            } else {
-                                $where .= ' ' . $condition['link'] . ' ' . $type . ' ' . $condition['condition'];
-                            }
-                            // last condition for this criteria in the group, end the section
-                            if ($position == (count($value) - 1)) {
-                                $where .= ')';
+                    // closing
+                    if ($previousMainGroup !== null) {
+                        if ($previousSubGroup !== null
+                            && ($previousMainGroup != $currentMainGroup
+                                || $previousSubGroup != $currentSubGroup)) {
+                            // close previous subgroup
+                            $where .= ')';
+                            // and connect it with the next subgroup if we are still in the same main group
+                            if ($previousMainGroup == $currentMainGroup) {
+                                $where .= $groupsOperators[$previousGroup . '-' . $currentGroup];
                             }
                         }
-                        $countCriterias++;
+                        if ($previousMainGroup != $currentMainGroup) {
+                            // close main group and connect it with the next main group
+                            $where .= ')' . $groupsOperators[$previousMainGroup . '-' . $currentMainGroup];
+                        }
                     }
-                    $countGroup++;
+                    // opening of new
+                    if ($previousMainGroup !== $currentMainGroup) {
+                        // open main group
+                        $previousSubGroup = null;
+                        $previousMainGroup = $currentMainGroup;
+                        $where .= ' (';
+                    }
+                    if ($previousSubGroup !== $currentSubGroup) {
+                        // start subgroup table
+                        $previousSubGroup = $currentSubGroup;
+                        $where .= ' (';
+                    } else {
+                        // or connect with previous criteria
+                        $where .= ' ' . $link . ' ';
+                    }
+                    $where .= $field . $condition;
                 }
-                $where .= ")";
+                // close last sub group and last main group
+                $where .= '))';
 
                 $query = "   SELECT `glpi_plugin_ticketalerts_alerts`.`alert_date`,
                              `glpi_plugin_ticketalerts_alerts`.`tickets_id`,

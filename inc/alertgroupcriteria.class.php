@@ -33,6 +33,9 @@ if (!defined('GLPI_ROOT')) {
 
 class PluginTicketalertsAlertGroupCriteria extends CommonDBTM {
 
+    const MOVE_BEFORE = 'before';
+    const MOVE_AFTER = 'after';
+    
     public $dohistory = true;
     static $rightname = 'plugin_ticketalerts_manage_groupalert';
 
@@ -92,58 +95,21 @@ class PluginTicketalertsAlertGroupCriteria extends CommonDBTM {
      */
     function prepareInputForAdd($input)
     {
-
-        if (empty($input["criteria"])) {
-            Session::addMessageAfterRedirect(__("Please select a criteria before submit", 'ticketalerts'),
-                false, ERROR);
-            return false;
-        }
-
-        $alertgroup_criteria = new PluginTicketalertsAlertGroupCriteria();
-
-        if ($input['rule_criterion_negation'] != 'NEGATION' ) {
-            if ($alertgroup_criteria->find(['criteria' => $input['criteria'],
-                    'plugin_ticketalerts_alertgroups_id' => $input['plugin_ticketalerts_alertgroups_id'],
-                    'rule_criterion' => 'AND',
-                    'group_number' => $input['group_number']])
-                && $input['rule_criterion'] == 'AND') {
-                Session::addMessageAfterRedirect(__("There's already a same existing criteria type for this group,
-                                                please select 'Or' Rule criterion", 'ticketalerts'),
+            if (empty($input["criteria"])) {
+                Session::addMessageAfterRedirect(__("Please select a criteria before submit", 'ticketalerts'),
                     false, ERROR);
                 return false;
             }
-        }
-
-
-        return $input;
-    }
-
-
-    /**
-     * @param array|\datas $input
-     *
-     * @return array|\datas|\the
-     */
-    function prepareInputForUpdate($input) {
-        if ($this->fields['users_id'] > 0) {
-            Session::addMessageAfterRedirect(__('The alert is already taken into account', 'ticketalerts'), false, ERROR);
-            return [];
-        }
-
-        if (isset($input['alert_date']) && empty($input['alert_date'])) {
-            $input['alert_date'] = 'NULL';
-        }
-
         return $input;
     }
 
     static function getRuleCriterionValueByCriterion($input) {
         switch ($input['rule_criterion']) {
             case 'AND':
-                return __('And', 'ticketalerts');
+                return __('AND');
                 break;
             case 'OR':
-                return __('Or', 'ticketalerts');
+                return __('OR');
                 break;
             default:
                 break;
@@ -152,55 +118,42 @@ class PluginTicketalertsAlertGroupCriteria extends CommonDBTM {
 
 
     static function getFilterValueByCriterion($input) {
-
         switch ($input['criteria']) {
             case 'ticket_type':
                 return Ticket::getTicketTypeName($input['filter']);
-                break;
             case 'itilcategory':
                 $itil_cat = new ITILCategory();
                 $itil_cat->getFromDB($input['filter']);
                 return $itil_cat->getField('name');
-                break;
             case 'alert_type':
                 $alert_type = new PluginTicketalertsAlertType();
                 $alert_type->getFromDB($input['filter']);
                 return $alert_type->getField('name');
-                break;
             case 'ticket_status':
                 return Ticket::getStatus($input['filter']);
-                break;
             case 'ticket_impact':
                 return CommonITILObject::getImpactName($input['filter']);
-                break;
             case 'ticket_urgency':
                 return CommonITILObject::getUrgencyName($input['filter']);
-                break;
             case 'ticket_priority':
                 return CommonITILObject::getPriorityName($input['filter']);
-                break;
             case 'ticket_location':
                 $location = new Location();
                 $location->getFromDB($input['filter']);
                 return $location->getField('name');
-                break;
             case 'ticket_creator':
             case 'alert_creator':
                 return getUserName($input['filter']);
-                break;
             case 'ticket_source':
                 $requesttype = new RequestType();
                 $requesttype->getFromDB($input['filter']);
                 return $requesttype->getField('name');
-                break;
             case 'entity':
                 $entity = new Entity();
                 $entity->getFromDB($input['filter']);
                 return $entity->getRawCompleteName();
-                break;
-            default:
-                break;
         }
+        return '';
     }
 
     /**
@@ -260,7 +213,6 @@ class PluginTicketalertsAlertGroupCriteria extends CommonDBTM {
         $forbidden[] = 'update';
         return $forbidden;
     }
-
 
     static function getCriteriasNameForDropdown($values) {
         $tabs = [];
@@ -330,4 +282,124 @@ class PluginTicketalertsAlertGroupCriteria extends CommonDBTM {
         return $tab[$key];
     }
 
+    /**
+     * Update groups_operator for the criteria's alertgroup
+     * @return void
+     */
+    public function post_addItem()
+    {
+        $criterias = $this->find(
+            ['plugin_ticketalerts_alertgroups_id' => $this->fields['plugin_ticketalerts_alertgroups_id']],
+            ['`group_number` ASC, `rank` ASC']
+        );
+        $group = new PluginTicketalertsAlertGroup();
+        $group->getFromDB($this->fields['plugin_ticketalerts_alertgroups_id']);
+        $groupsOperators = $group->getGroupsOperatorsArray($criterias);
+        $group->update([
+            'id' => $group->getID(),
+            'groups_operators' => json_encode($groupsOperators)
+        ]);
+    }
+
+    public function post_purgeItem()
+    {
+        $this->post_addItem();
+    }
+
+    public function post_deleteItem()
+    {
+        $this->post_addItem();
+    }
+
+    /**
+     * See RuleCollection::moveRule() (10.0.16)
+     * slightly modified
+     * @param $ID
+     * @param $ref_ID
+     * @param $group_number
+     * @param $type
+     * @return bool
+     */
+    static function moveCriteria($ID, $ref_ID, $group_number, $type = self::MOVE_AFTER) {
+        /** @var \DBmysql $DB */
+        global $DB;
+        $criteria = new self();
+
+        // Get actual ranking of criteria to move
+        $criteria->getFromDB($ID);
+        $old_rank = $criteria->fields["rank"];
+        $alertgroups_id = $criteria->fields['plugin_ticketalerts_alertgroups_id'];
+
+        // Compute new ranking
+        if ($ref_ID) { // Move after/before an existing rule
+            $criteria->getFromDB($ref_ID);
+            $rank = $criteria->fields["rank"];
+        } else if ($type == self::MOVE_AFTER) {
+            // Move after all
+            $result = $DB->request([
+                'SELECT' => ['MAX' => 'rank AS maxi'],
+                'FROM'   => $criteria->getTable(),
+                'WHERE'  => ['group_number' => $group_number]
+            ])->current();
+            $rank   = $result['maxi'];
+        } else {
+            // Move before all
+            $rank = 1;
+        }
+
+        $result = false;
+
+        if ($old_rank < $rank) {
+            if ($type == self::MOVE_BEFORE) {
+                $rank--;
+            }
+
+            // Move back all rules between old and new rank
+            $iterator = $DB->request([
+                'SELECT' => ['id', 'rank'],
+                'FROM'   => $criteria->getTable(),
+                'WHERE'  => [
+                    'group_number' => $group_number,
+                    'plugin_ticketalerts_alertgroups_id' => $alertgroups_id,
+                    ['rank'  => ['>', $old_rank]],
+                    ['rank'  => ['<=', $rank]]
+                ]
+            ]);
+            foreach ($iterator as $data) {
+                $data['rank']--;
+                $result = $criteria->update($data);
+            }
+        } else if ($old_rank > $rank) {
+            if ($type == self::MOVE_AFTER) {
+                $rank++;
+            }
+
+            // Move forward all rule  between old and new rank
+            $iterator = $DB->request([
+                'SELECT' => ['id', 'rank'],
+                'FROM'   => $criteria->getTable(),
+                'WHERE'  => [
+                    'group_number' => $group_number,
+                    'plugin_ticketalerts_alertgroups_id' => $alertgroups_id,
+                    ['rank'  => ['>=', $rank]],
+                    ['rank'  => ['<', $old_rank]]
+                ]
+            ]);
+            foreach ($iterator as $data) {
+                $data['rank']++;
+                $result = $criteria->update($data);
+            }
+        } else { // $old_rank == $rank : nothing to do
+            $result = false;
+        }
+
+        // Move the rule
+        if ($result && ($old_rank != $rank)) {
+            $result = $criteria->update([
+                'id'      => $ID,
+                'rank' => $rank
+            ]);
+        }
+        return ($result ? true : false);
+    }
 }

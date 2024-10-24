@@ -63,7 +63,7 @@ class PluginTicketalertsProfile extends Profile {
 
       $rights = ['plugin_ticketalerts'                   => ALLSTANDARDRIGHT + READNOTE + UPDATENOTE,
                  'plugin_ticketalerts_manage_groupalert' => 0];
-      self::addDefaultProfileInfos($ID, $rights, true);
+      self::addDefaultProfileInfos($ID, $rights);
    }
 
     /**

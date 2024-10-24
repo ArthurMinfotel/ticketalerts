@@ -36,7 +36,7 @@ function plugin_ticketalerts_install()
     include_once(GLPI_ROOT . "/plugins/ticketalerts/inc/alert.class.php");
     if (!$DB->TableExists("glpi_plugin_ticketalerts_alerts")) {
         $install = true;
-        $DB->runFile(GLPI_ROOT . "/plugins/ticketalerts/sql/empty-2.0.0.sql");
+        $DB->runFile(GLPI_ROOT . "/plugins/ticketalerts/sql/empty-2.1.0.sql");
 
         $query = "INSERT INTO `glpi_plugin_ticketalerts_alerttypes` VALUES(NULL, '" . __(
                 'New comment tickets',
@@ -106,6 +106,63 @@ function plugin_ticketalerts_install()
 
         if (!$DB->fieldExists("glpi_plugin_ticketalerts_alertgroupcriterias","group_criteria")) {
             $DB->runFile(GLPI_ROOT . "/plugins/ticketalerts/sql/update-2.0.3.sql");
+        }
+
+        if (!$DB->fieldExists("glpi_plugin_ticketalerts_alertgroups","groups_operators")) {
+            $DB->runFile(GLPI_ROOT . "/plugins/ticketalerts/sql/update-2.1.0.sql");
+            // generate base values for added fields
+            $groupObj = new PluginTicketalertsAlertGroup();
+            $criteriaObj = new PluginTicketalertsAlertGroupCriteria();
+            $groups = $groupObj->find();
+            foreach($groups as $group) {
+                $criterias = $criteriaObj->find(
+                    ['plugin_ticketalerts_alertgroups_id' => $group['id']],
+                    ['`group_number` ASC, `rank` ASC, `criteria` ASC, `rule_criterion` ASC']
+                );
+                if (count($criterias)) {
+                    $groupOperators = [];
+                    $previousGroup = null;
+                    $previousCriteria = null;
+                    $rank = 1;
+                    foreach ($criterias as $criteria) {
+                        // generate JSON for group_operators
+                        if ($previousGroup != $criteria['group_number']) {
+                            if ($previousGroup) {
+                                $groupOperators[$previousGroup . '-' . $criteria['group_number']] = isset($group['group_criterion']) ? $group['group_criterion'] : 'AND';
+                            }
+                            $previousGroup = $criteria['group_number'];
+                            $previousCriteria = null;
+                            $rank = 1;
+                        }
+                        $newGroup = $criteria['group_number'] . '_1';
+                        // old behavior regrouped criteria of the same field together, so we put each criteria on the same field in the same subgroup
+                        if ($previousCriteria && $previousCriteria['criteria'] != $criteria['criteria']) {
+                            $previousCriteriaGroup = $previousCriteria['group_number'];
+                            $split = explode ('_', $previousCriteriaGroup);
+                            $newGroup = $criteria['group_number'] . '_' . ((int) $split[1] + 1);
+                            $groupOperators[$previousCriteriaGroup . '-' . $newGroup] = isset($group['group_criterion']) ? $group['group_criterion'] : 'AND';
+                            $rank = 1;
+                        }
+                        $criteria['group_number'] = $newGroup;
+                        $previousCriteria = $criteria;
+                        // initiate ranking for criteria and change group to put it in a subgroup
+                        $criteriaObj->fields = [];
+                        $criteriaObj->fields['id'] = $criteria['id'];
+                        $criteriaObj->update([
+                            'id' => $criteria['id'],
+                            'rank' => $rank,
+                            'group_number' => $criteria['group_number']
+                        ]);
+                        $rank++;
+                    }
+                }
+                $groupObj->fields = [];
+                $groupObj->fields['id'] = $group['id'];
+                $groupObj->update([
+                    'id' => $group['id'],
+                    'groups_operators' => json_encode($groupOperators)
+                ]);
+            }
         }
     }
 

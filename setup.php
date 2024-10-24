@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_TICKETALERTS_VERSION', '2.0.3');
+define('PLUGIN_TICKETALERTS_VERSION', '2.1.0');
 
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
@@ -74,8 +74,6 @@ function plugin_init_ticketalerts() {
          $PLUGIN_HOOKS['use_massive_action']['ticketalerts'] = 1;
       }
    }
-
-   $PLUGIN_HOOKS['webservices']['ticketalerts'] = 'plugin_ticketalerts_registerMethods';
 }
 
 // Get the name and the version of the plugin - Needed
