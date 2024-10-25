@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI Project - Tasklists plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-18 17:08+0200\n"
-"PO-Revision-Date: 2024-09-18 17:11+0200\n"
+"POT-Creation-Date: 2024-10-25 09:24+0200\n"
+"PO-Revision-Date: 2024-10-25 09:26+0200\n"
 "Last-Translator: Xavier CAILLAUD <tsmr@thetsmr.fr>\n"
 "Language-Team: French (France) (http://www.transifex.com/tsmr/GLPI_tasklists/"
 "language/fr_FR/)\n"
@@ -32,19 +32,36 @@ msgstr "Nouvel incident"
 msgid "New customer request"
 msgstr "Nouvelle demande client"
 
-#: setup.php:85 inc/alert.class.php:51 inc/alert.class.php:583
-#: inc/alert.class.php:681
+#: setup.php:83 inc/alert.class.php:51 inc/alert.class.php:589
+#: inc/alert.class.php:687
 msgid "Ticket alert"
 msgid_plural "Tickets alerts"
 msgstr[0] "Alerte ticket"
 msgstr[1] "Alertes tickets"
 
-#: setup.php:103
+#: setup.php:101
 msgid "This plugin requires GLPI >= 10.0 and < 10.1"
 msgstr "Ce plugin nécessite GLPI >= 10.0 et < 10.1"
 
+#: ajax/criteria.php:42
+msgid "Order updated"
+msgstr "Ordre mis à jour"
+
+#: ajax/criteria.php:45
+msgid "Error when updating order"
+msgstr "Erreur lors de la mise à jour de l'ordre"
+
+#: ajax/groupoperator.php:50
+#, php-format
+msgid "Operator for groups %s updated"
+msgstr "Opérateur pour les groupes %s mis à jour"
+
+#: ajax/groupoperator.php:54
+#, php-format
+msgid "Error when updating operator for groups %s"
+msgstr "Erreur lors de la mise à jour de l'opérateur pour les groupes %s"
+
 #: ajax/updateAlert.php:42 front/alert.form.php:72 inc/alert.class.php:241
-#: inc/alertgroup.class.php:216 inc/alertgroupcriteria.class.php:111
 msgid "The alert is already taken into account"
 msgstr "Cette alerte a déjà été pris en compte"
 
@@ -61,14 +78,14 @@ msgstr "Ticket pris en compte par Alturing"
 msgid "Please activate the plugin"
 msgstr "Merci d'activer le plugin"
 
-#: inc/alert.class.php:79 inc/alert.class.php:274 inc/alert.class.php:631
-#: inc/alert.class.php:731 inc/alerttype.class.php:38
+#: inc/alert.class.php:79 inc/alert.class.php:280 inc/alert.class.php:637
+#: inc/alert.class.php:737 inc/alerttype.class.php:38
 msgid "Alert type"
 msgid_plural "Alert Types"
 msgstr[0] "Type d'alerte"
 msgstr[1] "Types d'alerte"
 
-#: inc/alert.class.php:96 inc/alert.class.php:307
+#: inc/alert.class.php:96 inc/alert.class.php:313
 msgid "Alert creator"
 msgstr "Créateur de l'alerte"
 
@@ -76,8 +93,8 @@ msgstr "Créateur de l'alerte"
 msgid "Date of taking into account"
 msgstr "Date de prise en compte"
 
-#: inc/alert.class.php:123 inc/alert.class.php:298 inc/alert.class.php:628
-#: inc/alert.class.php:728
+#: inc/alert.class.php:123 inc/alert.class.php:304 inc/alert.class.php:634
+#: inc/alert.class.php:734
 msgid "Alert date"
 msgstr "Date de l'alerte"
 
@@ -85,127 +102,108 @@ msgstr "Date de l'alerte"
 msgid "Alert"
 msgstr "Alerte"
 
-#: inc/alert.class.php:336
+#: inc/alert.class.php:342
 #, php-format
 msgid "The %s"
 msgstr "Le %s"
 
-#: inc/alert.class.php:386 inc/alert.class.php:404 inc/alert.class.php:809
+#: inc/alert.class.php:392 inc/alert.class.php:410 inc/alert.class.php:815
 msgid "To take into account"
 msgstr "A prendre en compte"
 
-#: inc/alert.class.php:389 inc/alert.class.php:405
+#: inc/alert.class.php:395 inc/alert.class.php:411
 msgid "Taken into account"
 msgstr "Pris en compte"
 
-#: inc/alert.class.php:629 inc/alert.class.php:729
+#: inc/alert.class.php:635 inc/alert.class.php:735
 msgid "Case number"
 msgstr "Numéro de dossier"
 
-#: inc/alert.class.php:630 inc/alert.class.php:730
+#: inc/alert.class.php:636 inc/alert.class.php:736
 msgid "Case type"
 msgstr "Type de dossier"
 
-#: inc/alert.class.php:1026
+#: inc/alert.class.php:978
 msgid "No datas for the this group"
 msgstr "Pas de données pour ce groupe"
 
-#: inc/alert.class.php:1030
+#: inc/alert.class.php:982
 msgid "No criteria have been setup for this group"
 msgstr "Aucun critère n'a été configuré pour ce groupe"
 
-#: inc/alert.class.php:1056 inc/alert.class.php:1066
+#: inc/alert.class.php:1003 inc/alert.class.php:1013
 msgid "Missing parameter"
 msgstr "Paramètre manquant"
 
-#: inc/alert.class.php:1076 inc/alert.class.php:1086 inc/alert.class.php:1111
+#: inc/alert.class.php:1023 inc/alert.class.php:1033 inc/alert.class.php:1058
 msgid "Bad parameter"
 msgstr "Mauvais Paramètre"
 
-#: inc/alert.class.php:1098
+#: inc/alert.class.php:1045
 msgid "Alert type not found into GLPI"
 msgstr "Type d'alerte non trouvée dans GLPI"
 
-#: inc/alertgroup.class.php:45
+#: inc/alertgroup.class.php:59
 msgid "Ticket alert group"
 msgid_plural "Tickets alerts groups"
 msgstr[0] "Groupe d'alerte ticket"
 msgstr[1] "Groupes d'alerte ticket"
 
-#: inc/alertgroup.class.php:201
-msgid "You can't add a group without name"
-msgstr "Vous ne pouvez pas ajouter de groupe sans nom"
+#: inc/alertgroup.class.php:255
+msgid "Rule criterion"
+msgstr "Règle du critère"
 
-#: inc/alertgroup.class.php:265 inc/alertgroupcriteria.class.php:49
+#: inc/alertgroup.class.php:257
+msgid "And"
+msgstr "Et"
+
+#: inc/alertgroup.class.php:257
+msgid "Or"
+msgstr "Ou"
+
+#: inc/alertgroup.class.php:260 inc/alertgroupcriteria.class.php:70
 msgid "Criterion"
 msgid_plural "Criteria"
 msgstr[0] "Critère"
 msgstr[1] "Critères"
 
-#: inc/alertgroup.class.php:269
-msgid "Rule criterion"
-msgstr "Règle du critère"
-
-#: inc/alertgroup.class.php:271 inc/alertgroup.class.php:422
-#: inc/alertgroupcriteria.class.php:125
-msgid "And"
-msgstr "Et"
-
-#: inc/alertgroup.class.php:271 inc/alertgroup.class.php:422
-#: inc/alertgroupcriteria.class.php:128
-msgid "Or"
-msgstr "Ou"
-
-#: inc/alertgroup.class.php:282 inc/alertgroup.class.php:354
-msgid "Filter"
-msgid_plural "Filters"
-msgstr[0] "Filtre"
-msgstr[1] "Filtres"
-
-#: inc/alertgroup.class.php:297
+#: inc/alertgroup.class.php:285
 msgid "Negation"
 msgid_plural "Negations"
 msgstr[0] "Négation"
 msgstr[1] "Négations"
 
-#: inc/alertgroup.class.php:303
+#: inc/alertgroup.class.php:294
+msgid "Filter"
+msgid_plural "Filters"
+msgstr[0] "Filtre"
+msgstr[1] "Filtres"
+
+#: inc/alertgroup.class.php:308
 msgid "Group criteria"
 msgstr "Critère de groupe"
 
-#: inc/alertgroup.class.php:355
-msgid "Rule Criterion"
-msgstr "Critère de règle"
-
-#: inc/alertgroupcriteria.class.php:79
+#: inc/alertgroupcriteria.class.php:99
 msgid "Please select a criteria before submit"
 msgstr "Merci de choisir un critère avant de soumettre "
 
-#: inc/alertgroupcriteria.class.php:92
-msgid ""
-"There's already a same existing criteria type for this group,\n"
-"                                                please select 'Or' Rule "
-"criterion"
-msgstr ""
-"Il y a déjà un critère identique pour ce groupe, merci de choisir  la règle "
-"de critère \"Ou\""
-
-#: inc/alertgroupcriteria.class.php:248
+#: inc/alertgroupcriteria.class.php:223
 msgid "Ticket category"
 msgstr "Catégorie du ticket"
 
-#: inc/alertgroupcriteria.class.php:272
+#: inc/alertgroupcriteria.class.php:247
 msgid "Ticket creator"
 msgstr "Créateur du ticket"
 
-#: inc/alertgroupcriteria.class.php:275
+#: inc/alertgroupcriteria.class.php:250
 msgid "Ticket alert creator"
 msgstr "Créateur de l'alerte du ticket"
 
-#: inc/alertgroupcriteria.class.php:295 inc/alertgroupcriteria.class.php:303
+#: inc/alertgroupcriteria.class.php:270 inc/alertgroupcriteria.class.php:278
 msgid "is"
 msgstr "est"
 
-#: inc/alertgroupcriteria.class.php:296 inc/alertgroupcriteria.class.php:304
+#: inc/alertgroupcriteria.class.php:271 inc/alertgroupcriteria.class.php:279
 msgid "is not"
 msgstr "n'est pas"
 
@@ -242,6 +240,20 @@ msgstr "Une erreur s'est produite lors de l'import de l'alerte"
 #: inc/profile.class.php:128 inc/profile.class.php:156
 msgid "Manage group alert"
 msgstr "Gérer les groupes d'alerte ticket"
+
+#~ msgid "You can't add a group without name"
+#~ msgstr "Vous ne pouvez pas ajouter de groupe sans nom"
+
+#~ msgid "Rule Criterion"
+#~ msgstr "Critère de règle"
+
+#~ msgid ""
+#~ "There's already a same existing criteria type for this group,\n"
+#~ "                                                please select 'Or' Rule "
+#~ "criterion"
+#~ msgstr ""
+#~ "Il y a déjà un critère identique pour ce groupe, merci de choisir  la "
+#~ "règle de critère \"Ou\""
 
 #~ msgid "There's already a same existing criteria type for this group"
 #~ msgstr "Il y a déjà un type de critère existant pour ce groupe"

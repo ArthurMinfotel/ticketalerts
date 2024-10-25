@@ -33,12 +33,18 @@ include('../../../inc/includes.php');
 
 switch ($_REQUEST['action']) {
     case "move_criteria":
-        PluginTicketalertsAlertGroupCriteria::moveCriteria(
+        if (PluginTicketalertsAlertGroupCriteria::moveCriteria(
             (int) $_POST['criteria_id'],
             (int) $_POST['ref_id'],
             (int) $_POST['criteria_group'],
             $_POST['sort_action']
-        );
-        Session::addMessageAfterRedirect(__('Order updated', 'ticketalerts'));
+        )) {
+            Session::addMessageAfterRedirect(__('Order updated', 'ticketalerts'));
+        } else {
+            Session::addMessageAfterRedirect(
+                __('Error when updating order', 'ticketalerts'),
+                ERROR
+            );
+        }
         break;
 }

@@ -115,6 +115,7 @@ function plugin_ticketalerts_install()
             $criteriaObj = new PluginTicketalertsAlertGroupCriteria();
             $groups = $groupObj->find();
             foreach($groups as $group) {
+                Toolbox::logInfo('NEW GROUP ' . $group['id']);
                 $criterias = $criteriaObj->find(
                     ['plugin_ticketalerts_alertgroups_id' => $group['id']],
                     ['`group_number` ASC, `rank` ASC, `criteria` ASC, `rule_criterion` ASC']
@@ -136,12 +137,17 @@ function plugin_ticketalerts_install()
                         }
                         $newGroup = $criteria['group_number'] . '_1';
                         // old behavior regrouped criteria of the same field together, so we put each criteria on the same field in the same subgroup
-                        if ($previousCriteria && $previousCriteria['criteria'] != $criteria['criteria']) {
-                            $previousCriteriaGroup = $previousCriteria['group_number'];
-                            $split = explode ('_', $previousCriteriaGroup);
-                            $newGroup = $criteria['group_number'] . '_' . ((int) $split[1] + 1);
-                            $groupOperators[$previousCriteriaGroup . '-' . $newGroup] = isset($group['group_criterion']) ? $group['group_criterion'] : 'AND';
-                            $rank = 1;
+                        if ($previousCriteria !== null) {
+                            $newGroup = $previousCriteria['group_number'];
+                            if ($previousCriteria['criteria'] != $criteria['criteria']) {
+                                $previousCriteriaGroup = $previousCriteria['group_number'];
+                                $split = explode ('_', $previousCriteriaGroup);
+                                $subGroup = $split[1] + 1;
+                                $newGroup = $criteria['group_number'] . '_' . $subGroup;
+                                $subOperator = $criteria['rule_criterion_negation'] == 'AFFIRMATION' ? 'AND' : 'OR';
+                                $groupOperators[$previousCriteriaGroup . '-' . $newGroup] = $subOperator;
+                                $rank = 1; // new subgroup = rank reset
+                            }
                         }
                         $criteria['group_number'] = $newGroup;
                         $previousCriteria = $criteria;
