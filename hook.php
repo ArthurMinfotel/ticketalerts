@@ -115,7 +115,6 @@ function plugin_ticketalerts_install()
             $criteriaObj = new PluginTicketalertsAlertGroupCriteria();
             $groups = $groupObj->find();
             foreach($groups as $group) {
-                Toolbox::logInfo('NEW GROUP ' . $group['id']);
                 $criterias = $criteriaObj->find(
                     ['plugin_ticketalerts_alertgroups_id' => $group['id']],
                     ['`group_number` ASC, `rank` ASC, `criteria` ASC, `rule_criterion` ASC']

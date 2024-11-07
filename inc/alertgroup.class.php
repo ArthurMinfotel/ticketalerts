@@ -409,7 +409,6 @@ class PluginTicketalertsAlertGroup extends CommonDBTM
                          });
 JAVASCRIPT;
                             echo Html::scriptBlock($js);
-                            Html::closeForm();
 
                             if ($previousMainGroup == $currentMainGroup) {
                                 echo "<div class='my-2'>";
@@ -439,6 +438,7 @@ JAVASCRIPT;
                         }
                     }
                     if ($previousMainGroup != $currentMainGroup) {
+                        Html::closeForm();
                         // close main group accordion body
                         echo "</div>";
                         echo "</div>";
